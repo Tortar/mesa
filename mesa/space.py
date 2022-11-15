@@ -416,8 +416,16 @@ class Grid:
             pos: Tuple of new position to move the agent to.
         """
         pos = self.torus_adj(pos)
-        self.remove_agent(agent)
-        self.place_agent(agent, pos)
+        if (pos := agent.pos) is None:
+            return
+        x, y = pos
+        self.grid[x][y] = self.default_val()
+        self.empties.add(pos)
+        agent.pos = None
+        x, y = pos
+        self.grid[x][y] = agent
+        self.empties.discard(pos)
+        agent.pos = pos
 
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Place the agent at the specified location, and set its pos variable."""
@@ -593,6 +601,26 @@ class MultiGrid(Grid):
     def default_val() -> MultiGridContent:
         """Default value for new cell elements."""
         return []
+    
+    def move_agent(self, agent: Agent, pos: Coordinate) -> None:
+        """Move an agent from its current position to a new position.
+
+        Args:
+            agent: Agent object to move. Assumed to have its current location
+                   stored in a 'pos' tuple.
+            pos: Tuple of new position to move the agent to.
+        """
+        pos = agent.pos
+        x, y = pos
+        self.grid[x][y].remove(agent)
+        if self.is_cell_empty(pos):
+            self.empties.add(pos)
+        agent.pos = None
+        x, y = pos
+        if agent.pos is None or agent not in self.grid[x][y]:
+            self.grid[x][y].append(agent)
+            agent.pos = pos
+            self.empties.discard(pos)
 
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Place the agent at the specified location, and set its pos variable."""
