@@ -415,17 +415,16 @@ class Grid:
                    stored in a 'pos' tuple.
             pos: Tuple of new position to move the agent to.
         """
-        pos = self.torus_adj(pos)
-        if (pos := agent.pos) is None:
-            return
-        x, y = pos
-        self.grid[x][y] = self.default_val()
-        self.empties.add(pos)
-        agent.pos = None
-        x, y = pos
+        if agent.pos is not None:
+            self.empties.add(agent.pos)
+            x, y = agent.pos
+            self.grid[x][y] = self.default_val()
+
+        new_pos = self.torus_adj(pos)
+        x, y = new_pos
         self.grid[x][y] = agent
-        self.empties.discard(pos)
-        agent.pos = pos
+        self.empties.discard(new_pos)
+        agent.pos = new_pos
 
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Place the agent at the specified location, and set its pos variable."""
