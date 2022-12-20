@@ -295,21 +295,18 @@ class TestSingleGrid(unittest.TestCase):
         """
         Test the SingleGrid empty count and enforcement.
         """
-
         assert len(self.grid.empties) == 9
         a = MockAgent(100, None)
         with self.assertRaises(Exception):
             self.grid.place_agent(a, (0, 1))
 
         # Place the agent in an empty cell
-        mock_model.schedule.get_agent_count = Mock(side_effect=lambda: len(self.agents))
         self.grid.position_agent(a)
-        self.num_agents += 1
         # Test whether after placing, the empty cells are reduced by 1
         assert a.pos not in self.grid.empties
         assert len(self.grid.empties) == 8
         for i in range(10):
-            self.grid.move_to_empty(a, num_agents=self.num_agents)
+            self.grid.move_to_empty(a)
         assert len(self.grid.empties) == 8
 
         # Place agents until the grid is full
@@ -317,7 +314,6 @@ class TestSingleGrid(unittest.TestCase):
         for i in range(empty_cells):
             a = MockAgent(101 + i, None)
             self.grid.position_agent(a)
-            self.num_agents += 1
         assert len(self.grid.empties) == 0
 
         a = MockAgent(110, None)
