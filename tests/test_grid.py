@@ -272,25 +272,6 @@ class TestSingleGrid(unittest.TestCase):
         self.num_agents = len(self.agents)
 
     @patch.object(MockAgent, "model", create=True)
-    def test_position_agent(self, mock_model):
-        a = MockAgent(100, None)
-        with self.assertRaises(Exception) as exc_info:
-            self.grid.position_agent(a, (1, 1))
-        expected = (
-            "x must be an integer or a string 'random'."
-            " Actual type: <class 'tuple'>. Actual value: (1, 1)."
-        )
-        assert str(exc_info.exception) == expected
-        with self.assertRaises(Exception) as exc_info:
-            self.grid.position_agent(a, "(1, 1)")
-        expected = (
-            "x must be an integer or a string 'random'."
-            " Actual type: <class 'str'>. Actual value: (1, 1)."
-        )
-        assert str(exc_info.exception) == expected
-        self.grid.position_agent(a, "random")
-
-    @patch.object(MockAgent, "model", create=True)
     def test_enforcement(self, mock_model):
         """
         Test the SingleGrid empty count and enforcement.
@@ -301,7 +282,7 @@ class TestSingleGrid(unittest.TestCase):
             self.grid.place_agent(a, (0, 1))
 
         # Place the agent in an empty cell
-        self.grid.position_agent(a)
+        self.grid.place_agent(a)
         # Test whether after placing, the empty cells are reduced by 1
         assert a.pos not in self.grid.empties
         assert len(self.grid.empties) == 8
@@ -313,14 +294,12 @@ class TestSingleGrid(unittest.TestCase):
         empty_cells = len(self.grid.empties)
         for i in range(empty_cells):
             a = MockAgent(101 + i, None)
-            self.grid.position_agent(a)
+            self.grid.place_agent(a)
         assert len(self.grid.empties) == 0
 
         a = MockAgent(110, None)
         with self.assertRaises(Exception):
-            self.grid.position_agent(a)
-        with self.assertRaises(Exception):
-            self.move_to_empty(self.agents[0], num_agents=self.num_agents)
+            self.grid.place_agent(a)
 
 
 # Number of agents at each position for testing
